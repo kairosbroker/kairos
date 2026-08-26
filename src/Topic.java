@@ -13,9 +13,32 @@ public class Topic
         this.topicName = key;
         this.subscriberCount = 1;   // a new topic starts with a single subscriber
         this.subscribers = new HashSet<ClientHandler>();
-        subscribers.add( creator );
-        this.msgs = new ArrayBlockingQueue<String>( 10 );
+        subscribers.add(creator);
+        this.msgs = new ArrayBlockingQueue<String>(10);
     }
 
+    public int addSubscriber(ClientHandler client)
+    {
+        if(subscribers.contains( client )){
+            System.err.println("Error: client already subscribed on this topic.");
+            return -1;
+        }
 
+        subscribers.add( client );
+        subscriberCount++;
+
+        return subscriberCount;
+    }
+
+     public int removeSubscriber(ClientHandler client){
+         if(!subscribers.contains( client )){
+             System.err.println("Error: client is not subscribed on this topic.");
+             return -1;
+         }
+
+         subscribers.remove( client );
+         subscriberCount--;
+
+         return subscriberCount;
+     }
 }
