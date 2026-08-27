@@ -1,44 +1,44 @@
 import java.util.HashSet;
 import java.util.concurrent.ArrayBlockingQueue;
 
-public class Topic
-{
+public class Topic {
     private final String topicName;
-    private int subscriberCount;
+    private int subscriberCount = 0;
     private HashSet<ClientHandler> subscribers;
     private ArrayBlockingQueue<String> msgs;
 
-    public Topic(String key, ClientHandler creator)
-    {
+    public Topic(String key, ClientHandler creator) {
         this.topicName = key;
-        this.subscriberCount = 1;   // a new topic starts with a single subscriber
         this.subscribers = new HashSet<ClientHandler>();
-        subscribers.add(creator);
         this.msgs = new ArrayBlockingQueue<String>(10);
+        addSubscriber(creator);
     }
 
-    public int addSubscriber(ClientHandler client)
-    {
-        if(subscribers.contains( client )){
+    public int addSubscriber(ClientHandler client) {
+        if (subscribers.contains(client)) {
             System.err.println("Error: client already subscribed on this topic.");
             return -1;
         }
 
-        subscribers.add( client );
+        subscribers.add(client);
         subscriberCount++;
 
         return subscriberCount;
     }
 
-     public int removeSubscriber(ClientHandler client){
-         if(!subscribers.contains( client )){
-             System.err.println("Error: client is not subscribed on this topic.");
-             return -1;
-         }
+    public int removeSubscriber(ClientHandler client) {
+        if (!subscribers.contains(client)) {
+            System.err.println("Error: client is not subscribed on this topic.");
+            return -1;
+        }
 
-         subscribers.remove( client );
-         subscriberCount--;
+        subscribers.remove(client);
+        subscriberCount--;
 
-         return subscriberCount;
-     }
+        return subscriberCount;
+    }
+
+    public int getMessagesQuantity() {
+        return msgs.size();
+    }
 }
