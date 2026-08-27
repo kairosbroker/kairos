@@ -1,0 +1,11 @@
+services:
+  server:
+    container_name: kairos
+    build:
+      dockerfile: Dockerfile
+      context: .
+    image: kairos
+    stdin_open: true
+    tty: true
+    ports:
+      - "9092:9092"
