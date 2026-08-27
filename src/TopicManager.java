@@ -1,69 +1,59 @@
 import java.util.HashMap;
 
-public class TopicManager
-{
+public class TopicManager {
     private static TopicManager INSTANCE;
     private final HashMap<String, Topic> topicPool;
 
-    private TopicManager()
-    {
+    private TopicManager() {
         this.topicPool = new HashMap<>();
     }
 
     public static TopicManager getInstance() {
-        if(INSTANCE == null)
-        {
+        if (INSTANCE == null) {
             INSTANCE = new TopicManager();
         }
 
         return INSTANCE;
     }
 
-    public Topic create(String name, ClientHandler client)
-    {
+    public Topic create(String name, ClientHandler client) {
         Topic _topic = new Topic(name, client);
-        topicPool.put( name, _topic );
+        topicPool.put(name, _topic);
 
         return _topic;
     }
 
-    public boolean join(String name, ClientHandler client)
-    {
-        Topic _topic = topicPool.get( name );
+    public boolean join(String name, ClientHandler client) {
+        Topic _topic = topicPool.get(name);
 
-        if(_topic == null)
-        {
+        if (_topic == null) {
             System.err.println("Error: topic nonexistent in poll, creating new one");
-            create( name, client );
+            create(name, client);
             return true;
         }
 
-        int joined = _topic.addSubscriber( client );
+        int joined = _topic.addSubscriber(client);
 
         return joined != -1;
     }
 
-    public boolean leave(String name, ClientHandler client)
-    {
-        Topic _topic = topicPool.get( name );
+    public boolean leave(String name, ClientHandler client) {
+        Topic _topic = topicPool.get(name);
 
-        if(_topic == null)
-        {
+        if (_topic == null) {
             System.err.println("Error: topic nonexistent in poll");
             return false;
         }
 
-        int left = _topic.removeSubscriber( client );
+        int remainingSubscribers = _topic.removeSubscriber(client);
 
-        if(left < 0){
-            return false;
+        if (remainingSubscribers >= 0) {
+            if (remainingSubscribers == 0 && _topic.getMessagesQuantity() == 0) {
+                topicPool.remove(name, _topic);
+                System.out.println("Last client unsubscribed from \"" + name + "\", removed from topic pool.");
+            }
+            return true;
         }
-        else if(left == 0)
-        {
-            topicPool.remove( name, _topic );
-            System.out.println("Last client unsubscribed from \"" + name + "\", removed from topic pool.");
-        }
-
-        return true;
+        return false;
     }
 }
