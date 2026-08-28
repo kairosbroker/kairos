@@ -1,14 +1,16 @@
 package protocol;
 
-public abstract class AbstractMessage {
+import java.io.Serializable;
+
+public abstract class AbstractMessage implements Serializable {
 
     protected final MessageType msgType;
 
-    public AbstractMessage(MessageType type){
+    public AbstractMessage(MessageType type) {
         this.msgType = type;
     }
 
-    public final MessageType getType(){
+    public final MessageType getType() {
         return msgType;
     }
 }
