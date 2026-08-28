@@ -16,7 +16,7 @@ public class Topic {
 
     public int addSubscriber(ClientHandler client) {
         if (subscribers.contains(client)) {
-            System.err.println("Error: client already subscribed on this topic.");
+            System.err.println("Error: client already subscribed to this topic.");
             return -1;
         }
 
