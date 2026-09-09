@@ -1,2 +1,10 @@
 apply plugin: 'idea'
 apply plugin: 'java'
+
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'org.kairos.Main'
+        )
+    }
+}

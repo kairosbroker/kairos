@@ -1,3 +1,5 @@
+package org.kairos;
+
 import static java.util.logging.Level.INFO;
 
 public class Logger {
@@ -26,7 +28,7 @@ public class Logger {
         log(msg, Level.INFO);
     }
 
-    public void log(String msg, @org.jetbrains.annotations.NotNull Level level) {
+    public void log(String msg, Level level) {
         msg = "[" + level + "] " + msg;
 
         switch(level) {

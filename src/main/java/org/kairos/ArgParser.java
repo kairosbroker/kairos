@@ -1,4 +1,7 @@
-public class ArgParser {
+package org.kairos;
+
+public class ArgParser
+{
     private final int port;
     private final int max_clients;
     private final int max_threads;
