@@ -8,3 +8,8 @@ jar {
         )
     }
 }
+
+tasks.named('jar') {
+    destinationDirectory = file('build/jar')
+    archiveFileName      = 'kairos.jar'
+}
