@@ -1,9 +1,14 @@
 services:
   server:
+    env_file: .env
     container_name: kairos
     build:
       dockerfile: Dockerfile
       context: .
+      args:
+        - SERVER_PORT=${SERVER_PORT}
+        - MAX_THREADS=${MAX_THREADS}
+        - MAX_CLIENTS=${MAX_CLIENTS}
     image: kairos
     stdin_open: true
     tty: true
