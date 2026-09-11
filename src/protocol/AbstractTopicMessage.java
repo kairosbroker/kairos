@@ -1,7 +1,6 @@
 package protocol;
 
 public abstract class AbstractTopicMessage extends AbstractMessage {
-
     private final String msg;
 
     public AbstractTopicMessage(MessageType type, String message) {
