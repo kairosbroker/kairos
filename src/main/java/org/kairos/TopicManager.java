@@ -1,3 +1,5 @@
+package org.kairos;
+
 import java.util.HashMap;
 
 public class TopicManager {

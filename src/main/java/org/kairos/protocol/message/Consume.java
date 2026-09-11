@@ -1,7 +1,7 @@
-package protocol.message;
+package org.kairos.protocol.message;
 
-import protocol.AbstractTopicMessage;
-import protocol.MessageType;
+import org.kairos.protocol.AbstractTopicMessage;
+import org.kairos.protocol.MessageType;
 
 public final class Consume extends AbstractTopicMessage {
     public Consume(String message) {

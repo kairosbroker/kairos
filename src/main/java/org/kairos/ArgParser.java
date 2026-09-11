@@ -1,23 +1,31 @@
-public class ArgParser {
+package org.kairos;
+
+public class ArgParser
+{
     private final int port;
     private final int max_clients;
     private final int max_threads;
 
     public ArgParser(String[] args) {
-        if (args.length < 4)
-            throw new RuntimeException("Missing args: IP port maxclients maxthreads");
+        if(args.length < 3)
+            throw new RuntimeException("Kairos usage: java -jar <app_file>.jar PORT MAX_CLIENTS MAX_THREADS");
 
-        parseIP(args[0]);
-        this.port = parseIntValue(args[1], "port", 0, 65535);
-        this.max_clients = parseIntValue(args[2], "max clients", 1, 99999);
-        this.max_threads = parseIntValue(args[3], "max threads", 1, 99999);
+//  Also, why was this put here, and never used???? Not even set to a var or something;
+//        parseIP( args[0] );
+        this.port = parseIntValue(args[0], "port", 0, 65535);
+        this.max_clients = parseIntValue(args[1], "max clients", 1, 99999);
+        this.max_threads = parseIntValue(args[2], "max threads", 1, 99999);
 
     }
 
-    private void parseIP(String ip) {
-        if (ip == null || ip.isEmpty())
-            throw new IllegalArgumentException("Arg validation: Invalid IP \"" + ip + "\"");
-    }
+/* App is dockerized, so IP shouldn't matter,
+but let's keep this commented out for a while, just to make sure we don't need it */
+
+//    private void parseIP(String ip)
+//    {
+//        if(ip == null || ip.isEmpty())
+//            throw new IllegalArgumentException("Arg validation: Invalid IP \"" + ip + "\"");
+//    }
 
     private static int parseIntValue(String argString, String argName, int minBound, int maxBound) {
         int _value;

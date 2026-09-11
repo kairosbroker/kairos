@@ -1,0 +1,4 @@
+#!/bin/bash
+set -e
+
+java -jar /app/build/jar/kairos.jar $SERVER_PORT $MAX_CLIENTS $MAX_THREADS

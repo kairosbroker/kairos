@@ -1,7 +1,7 @@
-package protocol.message;
+package org.kairos.protocol.message;
 
-import protocol.AbstractMessage;
-import protocol.MessageType;
+import org.kairos.protocol.AbstractMessage;
+import org.kairos.protocol.MessageType;
 
 public class Status extends AbstractMessage {
     public Status(MessageType type) {

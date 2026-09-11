@@ -1,4 +1,4 @@
-package protocol;
+package org.kairos.protocol;
 
 import java.io.Serializable;
 
