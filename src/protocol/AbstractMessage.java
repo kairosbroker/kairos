@@ -3,7 +3,6 @@ package protocol;
 import java.io.Serializable;
 
 public abstract class AbstractMessage implements Serializable {
-
     protected final MessageType msgType;
 
     public AbstractMessage(MessageType type) {
