@@ -1,7 +1,7 @@
-package protocol.message;
+package org.kairos.protocol.message;
 
-import protocol.AbstractMessage;
-import protocol.MessageType;
+import org.kairos.protocol.AbstractMessage;
+import org.kairos.protocol.MessageType;
 
 public final class TopicControl extends AbstractMessage {
     public TopicControl(MessageType type) {

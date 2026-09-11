@@ -1,4 +1,4 @@
-package protocol;
+package org.kairos.protocol;
 
 public abstract class AbstractTopicMessage extends AbstractMessage {
     private final String msg;
