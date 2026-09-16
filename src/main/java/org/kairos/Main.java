@@ -4,7 +4,10 @@ import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) {
-        System.out.println("Bem vindo ao kairós");
+        Logger.getInstance().log(
+                "Kairos waits for no one: like Perseus before Medusa, you must recognize the moment and act before it vanishes.",
+                Logger.Level.SUCCESS
+        );
 
         try {
             ArgParser serverArgs = new ArgParser(args);
