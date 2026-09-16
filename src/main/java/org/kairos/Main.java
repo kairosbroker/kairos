@@ -4,9 +4,8 @@ import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) {
-        Logger.getInstance().log(
-                "Kairos waits for no one: like Perseus before Medusa, you must recognize the moment and act before it vanishes.",
-                Logger.Level.SUCCESS
+        Logger.info(
+                "Kairos waits for no one: like Perseus before Medusa, you must recognize the moment and act before it vanishes."
         );
 
         try {

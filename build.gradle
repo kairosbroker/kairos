@@ -1,15 +1,27 @@
 apply plugin: 'idea'
 apply plugin: 'java'
 
+dependencies {
+    implementation 'org.slf4j:slf4j-api:2.0.17'
+    implementation 'ch.qos.logback:logback-classic:1.5.18'
+}
+
 jar {
     manifest {
         attributes(
                 'Main-Class': 'org.kairos.Main'
         )
     }
-}
 
-tasks.named('jar') {
     destinationDirectory = file('build/jar')
     archiveFileName      = 'kairos.jar'
+    duplicatesStrategy   = DuplicatesStrategy.EXCLUDE
+
+    from {
+        configurations.runtimeClasspath.collect { zipTree(it) }
+    }
+}
+
+repositories {
+    mavenCentral()
 }
