@@ -4,6 +4,13 @@ import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) {
+        Logger.info("\n█   █  ███  ███ ████   ███   ████   \n" +
+                      "█░ █ ░█ ░░█  █░░█░░░█ █ ░░█ █ ░░░░  \n" +
+                      "███ ░ █████░ █░░████░░█░ ░█░ ███░░░ \n" +
+                      "█░░█ ░█░░░█░░█░░█░░█░ █░░ █░░ ░░█   \n" +
+                      "█░░░█ █░░░█░███░█░░░█░ ███ ░████░░  \n" +
+                      " ░░  ░ ░░  ░░░░░ ░░  ░  ░░░ ░░░░░ ░ \n" +
+                      "  ░   ░ ░   ░ ░░░ ░   ░  ░░░  ░░░░  ");
         Logger.info(
                 "Kairos waits for no one: like Perseus before Medusa, you must recognize the moment and act before it vanishes."
         );

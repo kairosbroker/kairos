@@ -5,10 +5,10 @@ RUN mkdir app
 WORKDIR app/
 
 COPY entrypoint entrypoint
-COPY src/ src/
 COPY gradle/ gradle/
 COPY gradlew gradlew
 COPY build.gradle build.gradle
+COPY src/ src/
 
 FROM base AS copied_files
 
