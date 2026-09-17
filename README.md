@@ -1,3 +1,6 @@
+[![Java CI with Gradle](https://github.com/kairosbroker/kairos/actions/workflows/gradle.yml/badge.svg)](https://github.com/kairosbroker/kairos/actions/workflows/gradle.yml)
+[![Automatic Dependency Submission](https://github.com/kairosbroker/kairos/actions/workflows/dependency-graph/auto-submission/badge.svg)](https://github.com/kairosbroker/kairos/actions/workflows/dependency-graph/auto-submission)
+
 <img width="343" height="145" alt="image" src="https://github.com/user-attachments/assets/5287b6ce-ef51-4f81-bfdf-c3024f986e07" />
 
 🇬🇷
