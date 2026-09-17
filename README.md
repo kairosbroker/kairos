@@ -16,4 +16,4 @@ Kairós não espera por ninguém: como Perseu diante da Medusa, você deve recon
 Kairós is a simple to use, simple to deploy broker, developed by two recent graduates from ISCTE-IUL Computer Engineering programme.
 
 # How do I use it?
-You still don't. We are under development. 👷‍♂️🚧
+You don't just yet. We are under development. 👷‍♂️🚧
