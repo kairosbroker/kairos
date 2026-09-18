@@ -1,20 +1,29 @@
 package org.kairos.protocol.message;
 
-import org.kairos.protocol.AbstractCodeMessage;
+import org.kairos.protocol.AbstractMessage;
 import org.kairos.protocol.MessageType;
 
-import java.io.DataInputStream;
+import java.nio.ByteBuffer;
 
-public final class Control extends AbstractCodeMessage {
+public final class Control extends AbstractMessage {
     public Control(MessageType type) {
         super(type);
-        if (type.getMessagePackager() != this.getClass())
+        if (type.ordinal() < MessageType.MSG_CONNECT.ordinal() || type.ordinal() > MessageType.MSG_TIMEOUT.ordinal())
             throw new IllegalArgumentException("Invalid MessageType to Message package");
 
     }
 
-    public Control(MessageType type, DataInputStream input) {
-        super(type, input);
+    public Control(MessageType type, ByteBuffer data) {
+        super(type);
     }
 
+    @Override
+    public byte[] serialize() {
+        int msgSize = (Integer.SIZE / 8);
+        ByteBuffer serializedMessage = ByteBuffer.allocate(msgSize);
+
+        serializedMessage.putInt(this.getType().ordinal());
+
+        return serializedMessage.array();
+    }
 }
