@@ -10,6 +10,8 @@ public abstract class AbstractMessage {
     protected final MessageType msgType;
 
     public AbstractMessage(MessageType type) {
+        if (type.ordinal() >= MessageType.values().length)
+            throw new IllegalArgumentException("Invalid MessageType to Message package");
         this.msgType = type;
     }
 
