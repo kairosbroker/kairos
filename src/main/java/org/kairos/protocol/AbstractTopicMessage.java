@@ -1,5 +1,8 @@
 package org.kairos.protocol;
 
+import javax.imageio.stream.IIOByteBuffer;
+import java.nio.ByteBuffer;
+
 public abstract class AbstractTopicMessage extends AbstractMessage {
     private final String msg;
 
@@ -10,7 +13,24 @@ public abstract class AbstractTopicMessage extends AbstractMessage {
         this.msg = message;
     }
 
+    public AbstractTopicMessage(MessageType type, ByteBuffer data) {
+        super(type, data);
+        this.msg = data.toString();
+    }
+
     public final String getMessage() {
         return msg;
+    }
+
+    @Override
+    public byte[] serialize() {
+        int msgSize = (Integer.SIZE / 8) + (Integer.SIZE / 8) + getMessage().getBytes().length;
+        ByteBuffer serializedMessage = ByteBuffer.allocate(msgSize);
+
+        serializedMessage.putInt(this.getType().ordinal());
+        serializedMessage.putInt(getMessage().length());
+        serializedMessage.put(getMessage().getBytes());
+
+        return serializedMessage.array();
     }
 }
