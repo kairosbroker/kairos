@@ -3,7 +3,7 @@ package org.kairos.protocol.message;
 import org.kairos.protocol.AbstractCodeMessage;
 import org.kairos.protocol.MessageType;
 
-import java.nio.ByteBuffer;
+import java.io.DataInputStream;
 
 public final class Control extends AbstractCodeMessage {
     public Control(MessageType type) {
@@ -13,8 +13,8 @@ public final class Control extends AbstractCodeMessage {
 
     }
 
-    public Control(MessageType type, ByteBuffer data) {
-        super(type, data);
+    public Control(MessageType type, DataInputStream input) {
+        super(type, input);
     }
 
 }
