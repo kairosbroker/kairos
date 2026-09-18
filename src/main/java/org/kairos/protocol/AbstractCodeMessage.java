@@ -1,5 +1,6 @@
 package org.kairos.protocol;
 
+import java.io.DataInputStream;
 import java.nio.ByteBuffer;
 
 public abstract class AbstractCodeMessage extends AbstractMessage {
@@ -10,8 +11,8 @@ public abstract class AbstractCodeMessage extends AbstractMessage {
             throw new IllegalArgumentException("Invalid MessageType to Message package");
     }
 
-    public AbstractCodeMessage(MessageType type, ByteBuffer data) {
-        super(type, data);
+    public AbstractCodeMessage(MessageType type, DataInputStream input) {
+        super(type, input);
     }
 
     @Override
