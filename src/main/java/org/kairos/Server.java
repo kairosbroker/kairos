@@ -25,11 +25,13 @@ public class Server {
                 Socket socket = ss.accept();
                 ClientHandler ch = new ClientHandler(socket);
                 pool.execute(ch);
+                System.out.println("New client " + socket + " connected.");
             }
         } catch (IOException e) {
             System.out.println("Algo de errado não está certo");
         } finally {
             ss.close();
+            pool.close();
         }
     }
 }
