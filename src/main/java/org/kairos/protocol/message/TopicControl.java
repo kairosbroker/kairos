@@ -1,11 +1,11 @@
 package org.kairos.protocol.message;
 
-import org.kairos.protocol.AbstractMessage;
+import org.kairos.protocol.AbstractCodeMessage;
 import org.kairos.protocol.MessageType;
 
-import java.nio.ByteBuffer;
+import java.io.DataInputStream;
 
-public final class TopicControl extends AbstractMessage {
+public final class TopicControl extends AbstractCodeMessage {
     public TopicControl(MessageType type) {
         super(type);
         if (type.ordinal() != MessageType.MSG_JOIN.ordinal() && type.ordinal() != MessageType.MSG_LEAVE.ordinal())
@@ -13,13 +13,7 @@ public final class TopicControl extends AbstractMessage {
 
     }
 
-    @Override
-    public byte[] serialize() {
-        int msgSize = (Integer.SIZE / 8);
-        ByteBuffer serializedMessage = ByteBuffer.allocate(msgSize);
-
-        serializedMessage.putInt(this.getType().ordinal());
-
-        return serializedMessage.array();
+    public TopicControl(MessageType type, DataInputStream input) {
+        super(type, input);
     }
 }

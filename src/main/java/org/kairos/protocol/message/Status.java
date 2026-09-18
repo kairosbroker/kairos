@@ -3,7 +3,7 @@ package org.kairos.protocol.message;
 import org.kairos.protocol.AbstractCodeMessage;
 import org.kairos.protocol.MessageType;
 
-import java.nio.ByteBuffer;
+import java.io.DataInputStream;
 
 public class Status extends AbstractCodeMessage {
     public Status(MessageType type) {
@@ -12,7 +12,7 @@ public class Status extends AbstractCodeMessage {
             throw new IllegalArgumentException("Invalid MessageType to Message package");
     }
 
-    public Status(MessageType type, ByteBuffer data) {
-        super(type);
+    public Status(MessageType type, DataInputStream input) {
+        super(type, input);
     }
 }
