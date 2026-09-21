@@ -8,9 +8,10 @@ import java.io.DataInputStream;
 public final class TopicControl extends AbstractCodeMessage {
     public TopicControl(MessageType type) {
         super(type);
-        if (type.ordinal() != MessageType.MSG_JOIN.ordinal() && type.ordinal() != MessageType.MSG_LEAVE.ordinal())
+//        if (type.ordinal() != MessageType.MSG_JOIN.ordinal() && type.ordinal() != MessageType.MSG_LEAVE.ordinal())
+        if (type.getMessagePackager() != this.getClass()) {
             throw new IllegalArgumentException("Invalid MessageType to Message package");
-
+        }
     }
 
     public TopicControl(MessageType type, DataInputStream input) {
