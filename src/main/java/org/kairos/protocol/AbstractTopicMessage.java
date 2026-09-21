@@ -11,24 +11,21 @@ public abstract class AbstractTopicMessage extends AbstractMessage {
 
     public AbstractTopicMessage(MessageType type, String message) {
         super(type);
-        if (type.ordinal() != MessageType.MSG_PUBLISH.ordinal() && type.ordinal() != MessageType.MSG_CONSUME.ordinal())
-            throw new IllegalArgumentException("Invalid MessageType to Message package");
         this.msg = message;
     }
 
     public AbstractTopicMessage(MessageType type, DataInputStream input) throws IOException {
         super(type, input);
-        System.out.println("Building a " + type + " Message");
+//        System.out.println("Building a " + type + " Message");
         int msgSizeParam = input.readInt();
         if (msgSizeParam < 0 || msgSizeParam > MAX_MSG_BODY)
-            throw new ProtocolException("Second parameter has invalid payload size");
+            throw new ProtocolException("Message body size arrgument has invalid payload size");
 
         byte[] buffer = new byte[msgSizeParam];
         int msgSizeRead = input.read(buffer);
 
-        System.out.println("msgSizeParam " + msgSizeParam + " msgSizeRead " + msgSizeRead);
-        if (msgSizeParam != msgSizeRead)
-            throw new ProtocolException("payload size mismatch");
+//        System.out.println("msgSizeParam " + msgSizeParam + " msgSizeRead " + msgSizeRead);
+        if (msgSizeParam != msgSizeRead) throw new ProtocolException("payload size mismatch");
 
         this.msg = new String(buffer);
     }
@@ -39,10 +36,12 @@ public abstract class AbstractTopicMessage extends AbstractMessage {
 
     @Override
     public byte[] serialize() {
-        int msgSize = (Integer.SIZE / 8) + (Integer.SIZE / 8) + getMessage().getBytes(StandardCharsets.UTF_8).length;
+        int msgSize = (Byte.SIZE / 8) + (Integer.SIZE / 8) + getMessage().getBytes(StandardCharsets.UTF_8).length;
         ByteBuffer serializedMessage = ByteBuffer.allocate(msgSize);
 
-        serializedMessage.putInt(getType().ordinal());
+        byte myByte = (byte) getType().getID();
+//        System.out.println("MyByte: " + myByte + " was supposed to be: " + getType().getID());
+        serializedMessage.put((byte) getType().getID());
         serializedMessage.putInt(getMessage().getBytes(StandardCharsets.UTF_8).length);
         serializedMessage.put(getMessage().getBytes());
 

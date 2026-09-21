@@ -8,7 +8,7 @@ import java.io.DataInputStream;
 public final class Control extends AbstractCodeMessage {
     public Control(MessageType type) {
         super(type);
-        if (type.ordinal() < MessageType.MSG_CONNECT.ordinal() || type.ordinal() > MessageType.MSG_TIMEOUT.ordinal())
+        if (type.getMessagePackager() != this.getClass())
             throw new IllegalArgumentException("Invalid MessageType to Message package");
 
     }

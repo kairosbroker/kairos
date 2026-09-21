@@ -11,9 +11,6 @@ import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
 import java.net.SocketException;
-import java.net.SocketTimeoutException;
-import java.nio.ByteBuffer;
-import java.util.Arrays;
 
 public class ClientHandler extends Thread implements Runnable {
     private final Socket socket;
@@ -46,10 +43,8 @@ public class ClientHandler extends Thread implements Runnable {
         //  Accept and continue / Refuse and disconnect
         //  Consume msgs in topic
         try {
-            int messageTypeOrdinal = in.readInt();
-            Class<?> msgPackage = MessageType.getMessagePackageByOrdinal(messageTypeOrdinal);
-            Object connectMsg = AbstractMessage.deserialize(msgPackage, MessageType.values()[messageTypeOrdinal], in);
-            if (msgPackage != Control.class) {
+            Control connectMsg = (Control) AbstractMessage.deserialize(in.readUnsignedByte(), in);
+            if (connectMsg.getType() != MessageType.MSG_CONNECT) {
                 closeConnection(this);
             }
 
@@ -76,17 +71,15 @@ public class ClientHandler extends Thread implements Runnable {
         while (!disconnect) {
             //  infinite
             try {
-                int messageTypeOrdinal = in.readInt();
-                Class<?> msgPackage = MessageType.getMessagePackageByOrdinal(messageTypeOrdinal);
-                Object msg = AbstractMessage.deserialize(msgPackage, MessageType.values()[messageTypeOrdinal], in);
+                AbstractMessage msg = AbstractMessage.deserialize(in.readUnsignedByte(), in);
 
                 if (msg instanceof Publish pubMessage) {
-                    System.out.println("Received message: " + pubMessage.getMessage() );
+                    System.out.println("Received message: " + pubMessage.getMessage());
                     try {
-                        System.out.println("Trying to send consumer message");
+//                        System.out.println("Trying to send consumer message");
                         Consume consumeMessage = new Consume("kairós client worked, very cool Ó_ö");
                         byte[] encodedMsg = consumeMessage.serialize();
-                        System.out.println("encoded: " + Arrays.toString(encodedMsg));
+//                        System.out.println("encoded: " + Arrays.toString(encodedMsg));
                         out.write(encodedMsg);
                         out.flush();
 
