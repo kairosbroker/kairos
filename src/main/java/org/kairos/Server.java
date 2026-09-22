@@ -31,7 +31,7 @@ public class Server {
             System.out.println("Algo de errado não está certo");
         } finally {
             ss.close();
-            pool.close();
+            pool.shutdown();
         }
     }
 }
