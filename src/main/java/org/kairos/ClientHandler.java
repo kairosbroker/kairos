@@ -1,6 +1,6 @@
 package org.kairos;
 
-import org.kairos.protocol.AbstractMessage;
+import org.kairos.protocol.generic.Message;
 import org.kairos.protocol.MessageType;
 import org.kairos.protocol.message.Consume;
 import org.kairos.protocol.message.Control;
@@ -43,7 +43,7 @@ public class ClientHandler extends Thread implements Runnable {
         //  Accept and continue / Refuse and disconnect
         //  Consume msgs in topic
         try {
-            Control connectMsg = (Control) AbstractMessage.deserialize(in.readUnsignedByte(), in);
+            Control connectMsg = (Control) Message.deserialize(in.readUnsignedByte(), in);
             if (connectMsg.getType() != MessageType.MSG_CONNECT) {
                 closeConnection(this);
             }
@@ -71,7 +71,7 @@ public class ClientHandler extends Thread implements Runnable {
         while (!disconnect) {
             //  infinite
             try {
-                AbstractMessage msg = AbstractMessage.deserialize(in.readUnsignedByte(), in);
+                Message msg = Message.deserialize(in.readUnsignedByte(), in);
 
                 if (msg instanceof Publish pubMessage) {
                     System.out.println("Received message: " + pubMessage.getMessage());
