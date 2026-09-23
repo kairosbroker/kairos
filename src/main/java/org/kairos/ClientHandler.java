@@ -1,10 +1,9 @@
 package org.kairos;
 
-import org.kairos.protocol.generic.Message;
 import org.kairos.protocol.MessageType;
-import org.kairos.protocol.message.Consume;
+import org.kairos.protocol.generic.Message;
 import org.kairos.protocol.message.Control;
-import org.kairos.protocol.message.Publish;
+import org.kairos.protocol.message.JoinTopic;
 import org.kairos.protocol.message.Status;
 
 import java.io.*;
@@ -13,9 +12,10 @@ import java.net.Socket;
 import java.net.SocketException;
 
 public class ClientHandler extends Thread implements Runnable {
+
+    static final int CLIENT_IDENTIFY_TIMEOUT = 5000;
+
     private final Socket socket;
-    //    private ObjectOutputStream out;
-//    private ObjectInputStream in;
     private DataOutputStream out;
     private DataInputStream in;
     //    private HashSet topicKeys;
@@ -25,90 +25,98 @@ public class ClientHandler extends Thread implements Runnable {
         this.socket = socket;
 //        this.topicKeys = new HashSet<String>();
         try {
-//            out = new ObjectOutputStream( socket.getOutputStream() );
-//            in = new ObjectInputStream( socket.getInputStream() );
-            socket.setSoTimeout(5000);
             out = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
             in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
 
         } catch (IOException e) {
-//            throw new RuntimeException( e );
-            System.err.println("Was not able to open IO channels for the client handler");
+            Logger.error("Unable to open IO channels for the client handler", e);
         }
     }
 
     @Override
     public void run() {
-        //  Get topic name
-        //  Accept and continue / Refuse and disconnect
-        //  Consume msgs in topic
-        try {
-            Control connectMsg = (Control) Message.deserialize(in.readUnsignedByte(), in);
-            if (connectMsg.getType() != MessageType.MSG_CONNECT) {
-                closeConnection(this);
-            }
 
-        } catch (IOException | InvocationTargetException | NoSuchMethodException | InstantiationException |
-                 IllegalAccessException e) {
-            if (e.getClass() == SocketException.class) {
-                System.err.println("Connection was closed abruptly");
-            }
-            throw new RuntimeException(e);
+        MessageType clientType = greetClient();
+        if (clientType == null) return;
+        boolean isPublisher = clientType == MessageType.MSG_ID_PUBLISHER;
+        reply(new Status(MessageType.MSG_OK));
+
+        JoinTopic joinTopic = (JoinTopic) waitForResponse();
+
+        if (isPublisher) {
+            loopPublisher();
+        } else {
+            loopConsumer();
         }
 
-        Status okMessage = new Status(MessageType.MSG_OK);
+    }
+
+    private void loopPublisher() {
         try {
-            out.write(okMessage.serialize());
-            out.flush();
-            System.out.println("Sent message " + okMessage + " to client " + this.socket.getPort());
-            //closeConnection(this);
+            socket.setSoTimeout(0);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
-        boolean disconnect = false;
+        while (true) {
+            Message newMessage = waitForResponse();
 
-        while (!disconnect) {
-            //  infinite
-            try {
-                Message msg = Message.deserialize(in.readUnsignedByte(), in);
-
-                if (msg instanceof Publish pubMessage) {
-                    System.out.println("Received message: " + pubMessage.getMessage());
-                    try {
-//                        System.out.println("Trying to send consumer message");
-                        Consume consumeMessage = new Consume("kairós client worked, very cool Ó_ö");
-                        byte[] encodedMsg = consumeMessage.serialize();
-//                        System.out.println("encoded: " + Arrays.toString(encodedMsg));
-                        out.write(encodedMsg);
-                        out.flush();
-
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                } else if (msg instanceof Control controlMsg) {
-                    if (controlMsg.getType() == MessageType.MSG_DISCONNECT) {
-                        disconnect = true;
-                    }
-                }
-            } catch (IOException e) {
-
-                System.err.println("Caught IOException: " + e.getClass() + " - " + e.getLocalizedMessage());
-                disconnect = true;
-
-            } catch (InvocationTargetException | NoSuchMethodException | InstantiationException |
-                     IllegalAccessException e) {
-                throw new RuntimeException("Something wrong happened: " + e);
-            } finally {
-                if (disconnect) {
-                    try {
-                        closeConnection(this);
-                        System.out.println("Closed connection to client " + this.socket.getPort());
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
+            if (newMessage.getType() == MessageType.MSG_DISCONNECT) {
+                return;
             }
+            Logger.info("Client " + socket.getPort() + ": " + newMessage);
+        }
+
+    }
+
+    private void loopConsumer() {
+        // Fetch new Message in Topic Queue
+    }
+
+    private MessageType greetClient() {
+
+        try {
+            socket.setSoTimeout(CLIENT_IDENTIFY_TIMEOUT);
+            Control clientIdentify = (Control) waitForResponse();
+
+            if (clientIdentify.getType() != MessageType.MSG_ID_PUBLISHER && clientIdentify.getType() != MessageType.MSG_ID_CONSUMER) {
+                Logger.info("Client " + socket.getPort() + " did not identify the type of user in time (" + CLIENT_IDENTIFY_TIMEOUT / 1000 + " seconds)");
+                closeConnection(this);
+                return null;
+            }
+
+            return clientIdentify.getType();
+
+        } catch (IOException e) {
+            Logger.error("Connection was closed abruptly", e);
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    private boolean reply(Message message) {
+        try {
+            out.write(message.serialize());
+            out.flush();
+            Logger.info("Replied message " + message + " to client " + socket.getPort());
+            return true;
+
+        } catch (IOException e) {
+            Logger.error("Unable to reply to client " + socket.getPort(), e);
+            return false;
+        }
+    }
+
+    private Message waitForResponse() {   //(Class<M> expectedPackager)
+        try {
+            return Message.deserialize(in.readUnsignedByte(), in);
+
+        } catch (IOException | InvocationTargetException | NoSuchMethodException | InstantiationException |
+                 IllegalAccessException e) {
+            if (e.getClass() == SocketException.class) {
+                Logger.error("Connection was closed abruptly", e);
+            }
+            throw new RuntimeException(e);
         }
     }
 
