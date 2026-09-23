@@ -1,0 +1,297 @@
+[33mcommit ede7df5964349b8a7f817ccc993bf55e4ef5251b[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mta-protocol[m[33m)[m
+Author: tiagomcalves <271846427+tiagomcalves@users.noreply.github.com>
+Date:   Wed Sep 23 20:56:14 2026 +0100
+
+    Refactor protocol package
+    - Move abstract classes to "generic" package
+    - Remove "Abstract" from abstract class names
+    - Refactor TopicControl into abstract class TopicControlMessage
+      * JoinTopic and LeaveTopic extends TopicControlMessage
+
+[33mcommit d4f4f6a1056556286c430ee292a3f2ce1880213a[m
+Author: tiagomcalves <271846427+tiagomcalves@users.noreply.github.com>
+Date:   Mon Sep 21 21:16:31 2026 +0100
+
+    Update message packagers to serialize MessageID as a byte and deserialize as an int
+
+[33mcommit ed0c8df8ecc1601b3663d8c011f9670eb3d1f69c[m
+Author: tiagomcalves <271846427+tiagomcalves@users.noreply.github.com>
+Date:   Mon Sep 21 21:09:14 2026 +0100
+
+    Add changes to MessageType Enum
+    
+    - Switch usage of ordinal, which get assigned by order, to a hardcoded MessageID for consistency
+    - Each declared MessageType has a constant MessageID and Message Class
+      - No need to go through and update the switch statement to relate Enum entry and Classes
+    - Add getMessagePackager() and getID()
+    - Add static method fromId(int msgID) which returns MessageType by the hardcoded MessageID
+
+[33mcommit e916660aac0b85b882b80c07e778a35e59e5cdcc[m
+Author: tiagomcalves <271846427+tiagomcalves@users.noreply.github.com>
+Date:   Fri Sep 18 19:42:21 2026 +0100
+
+    Changes to message classes
+    
+    - AbstractMessage and children now take MessageType and DataInputStream
+      - These are now responsible for sequential data byte reception and deserialization
+    - Hardcoded message string body to 1008 bytes
+    - AbstractTopicMessage has a second parameter for expected message body size
+      - Size expected and received mismatch discards message and client
+    - AbstractTopicMessage now handles UTF-8 encoding
+    - getMessagePackage was refactored into getMessagePackageByOrdinal and getMessagePackageByType
+    - Fix getMessagePackageByType returning Publish class when taking MSG_CONSUME as argument
+    - Add missing constructors to Message classes
+    - Reformat entire package code
+
+[33mcommit 5f2760ae77b7b1945de89a11573c2f81c0a75576[m
+Author: tiagomcalves <271846427+tiagomcalves@users.noreply.github.com>
+Date:   Fri Sep 18 19:29:11 2026 +0100
+
+    Add socket timeout to 5 seconds, add temporary server-client message exchange test
+
+[33mcommit 6140e13481bf4aa2c7c26fade9819c951ab1661b[m
+Author: tiagomcalves <271846427+tiagomcalves@users.noreply.github.com>
+Date:   Fri Sep 18 02:39:09 2026 +0100
+
+    Add AbstractCodeMessage for additional safeguards
+
+[33mcommit a6a2dfc72ef059ca8d1e668bae0ac2c6ca8b5c1e[m
+Author: tiagomcalves <271846427+tiagomcalves@users.noreply.github.com>
+Date:   Fri Sep 18 02:04:40 2026 +0100
+
+    Implement serialize method to children Message classes
+
+[33mcommit 705ef6d0157a18ca7a776b4541abddea08c5bad5[m
+Author: tiagomcalves <271846427+tiagomcalves@users.noreply.github.com>
+Date:   Fri Sep 18 02:02:47 2026 +0100
+
+    Add static getMessagePackage to retrieve Message Class by MessageType ordinal
+
+[33mcommit a64f22fa6e0a089ebcb7c1e402380570ca314357[m
+Author: tiagomcalves <271846427+tiagomcalves@users.noreply.github.com>
+Date:   Fri Sep 18 01:57:25 2026 +0100
+
+    Trade Object Serializable Interface to custom (de)serializer
+    
+    Remove 'Serializable' Interface implementation
+    Add generic MessageType and ByteBuffer parameteres
+    Add abstract serialize() method to be implemented by children
+    Add deserialize() static method for general detection and packaging of messages
+
+[33mcommit 90a36da73c06330fa9b72d363180aebba5366f27[m
+Author: tiagomcalves <271846427+tiagomcalves@users.noreply.github.com>
+Date:   Fri Sep 18 01:56:11 2026 +0100
+
+    Close FixedThreadPool on Server shut down
+
+[33mcommit 982f22ef8131cfc70e73215bd7f2637764b21da9[m
+Author: tiagomcalves <271846427+tiagomcalves@users.noreply.github.com>
+Date:   Fri Sep 18 01:53:27 2026 +0100
+
+    Change Object Streams to Byte Data in ClientHandler
+
+[33mcommit 84131cbbc5502a4abdffe3057d79e88064499a64[m
+Author: tiagomcalves <271846427+tiagomcalves@users.noreply.github.com>
+Date:   Sat Sep 12 21:17:28 2026 +0100
+
+    Clear up duplicates
+
+[33mcommit 8292beb9c619692d0b4f18209a69bd1d34f2c820[m
+Author: Erick Ozaki <5694694+eozaki@users.noreply.github.com>
+Date:   Fri Sep 11 13:59:48 2026 +0100
+
+    Update src/protocol/message/Status.java
+
+[33mcommit b535551db89acce39609703b59e59fefe733c751[m
+Author: Erick Ozaki <5694694+eozaki@users.noreply.github.com>
+Date:   Fri Sep 11 13:59:42 2026 +0100
+
+    Update src/protocol/message/TopicControl.java
+
+[33mcommit 881220a8703a03ba67e99abf6722d4c43e01947d[m
+Author: Erick Ozaki <5694694+eozaki@users.noreply.github.com>
+Date:   Fri Sep 11 13:59:33 2026 +0100
+
+    Update src/protocol/AbstractMessage.java
+
+[33mcommit d4015f102f8caa8575cf5004bd031266ad6ec9aa[m
+Author: Erick Ozaki <5694694+eozaki@users.noreply.github.com>
+Date:   Fri Sep 11 13:59:27 2026 +0100
+
+    Update src/protocol/AbstractTopicMessage.java
+
+[33mcommit bcc15c2a67e7faf9082288aeba0027c2120e5c55[m
+Author: Erick Ozaki <5694694+eozaki@users.noreply.github.com>
+Date:   Fri Sep 11 13:59:20 2026 +0100
+
+    Update src/protocol/message/Control.java
+
+[33mcommit c51f45f302f21e3611131deb72ee4cbb8f6cb7f4[m
+Author: tiagomcalves <271846427+tiagomcalves@users.noreply.github.com>
+Date:   Sat Aug 29 00:42:12 2026 +0100
+
+    Add protocol message classes
+
+[33mcommit f2aa9a628044a8e6763bf9af489d019d6cb5360c[m
+Author: tiagomcalves <271846427+tiagomcalves@users.noreply.github.com>
+Date:   Fri Aug 28 23:58:19 2026 +0100
+
+    Add abstract class AbstractMessage
+
+[33mcommit d18874945500171cca1a8dfbd9eda61d24f59dfa[m
+Author: tiagomcalves <271846427+tiagomcalves@users.noreply.github.com>
+Date:   Fri Aug 28 19:23:48 2026 +0100
+
+    Fix typo, add MessageType enum
+
+[33mcommit cc7be17550136162b544864286deb7fc9f23dfe7[m
+Author: tiagomcalves <271846427+tiagomcalves@users.noreply.github.com>
+Date:   Thu Aug 27 14:38:59 2026 +0100
+
+    Add suggested changes
+
+[33mcommit 8a7609ab2a3a88b5bc294afb071f0a4ad316d03b[m
+Author: tiagomcalves <271846427+tiagomcalves@users.noreply.github.com>
+Date:   Wed Aug 26 01:13:22 2026 +0100
+
+    Add TopicManager singleton class
+    Change ClientHandler to store one topic for now
+    Add Getters/Setters to Topic class
+
+[33mcommit 88c7eba87160d54656c8a647af85a31fe492b54b[m
+Author: tiagomcalves <271846427+tiagomcalves@users.noreply.github.com>
+Date:   Tue Aug 25 00:37:03 2026 +0100
+
+    Add topic management draft
+
+[33mcommit e104ea454ab325d6500d64292745083737153509[m[33m ([m[1;32mmain[m[33m)[m
+Author: Erick Ozaki <5694694+eozaki@users.noreply.github.com>
+Date:   Fri Sep 11 22:01:56 2026 +0100
+
+    Dockerize app (#5)
+    
+    * remove remaining idea intellij config file
+    
+    * ignoring build and gradle files
+    
+    * adding gradle to project
+    
+    * wip
+    
+    * working-ish docker
+    
+    * remove .idea files
+    
+    * Sanitize ArgParser
+    
+    * Parametrize docker and app exec
+    
+    * cleanup
+    
+    * move topic related classes to package
+    
+    * Move protocol namespace to org.kairos.protocol
+    
+    ---------
+    
+    Co-authored-by: erick <erickozaki@aquaporservicos.pt>
+
+[33mcommit 8a4b7f7abe5af3994605e5515ebca89107f9c4f5[m
+Author: Tiago Alves <271846427+tiagomcalves@users.noreply.github.com>
+Date:   Fri Sep 11 20:03:53 2026 +0100
+
+    Protocol message classes (#4)
+    
+    * Add topic management draft
+    
+    * Add TopicManager singleton class
+    Change ClientHandler to store one topic for now
+    Add Getters/Setters to Topic class
+    
+    * Add suggested changes
+    
+    * Fix typo, add MessageType enum
+    
+    * Add abstract class AbstractMessage
+    
+    * Add protocol message classes
+    
+    * Update src/protocol/message/Control.java
+    
+    * Update src/protocol/AbstractTopicMessage.java
+    
+    * Update src/protocol/AbstractMessage.java
+    
+    * Update src/protocol/message/TopicControl.java
+    
+    * Update src/protocol/message/Status.java
+    
+    ---------
+    
+    Co-authored-by: Erick Ozaki <5694694+eozaki@users.noreply.github.com>
+
+[33mcommit e9a2100f28ae00fc73196e5722a11d10ca7c13d8[m
+Author: Tiago Alves <271846427+tiagomcalves@users.noreply.github.com>
+Date:   Thu Sep 3 12:53:29 2026 +0100
+
+    Ta topic (#3)
+    
+    * Add topic management draft
+    
+    * Add TopicManager singleton class
+    Change ClientHandler to store one topic for now
+    Add Getters/Setters to Topic class
+    
+    * Add suggested changes
+    
+    * Fix typo, add MessageType enum
+
+[33mcommit 6f31063212ee922815bdf0b3c9ed8003930b1136[m
+Author: Tiago Alves <271846427+tiagomcalves@users.noreply.github.com>
+Date:   Mon Aug 24 23:27:11 2026 +0100
+
+    Add launch arguments parsing (#2)
+    
+    * Add launch arguments parsing
+    
+    * Refactor
+    
+     - [x] codestyle;
+     - [x] rename ArgValidator -> ArgParser;
+    
+    ---------
+    
+    Co-authored-by: erick <erickozaki@aquaporservicos.pt>
+
+[33mcommit 3e2843deee6ceab7a8f4b40334094b7333123e7b[m
+Merge: 3d17183 42c8f74
+Author: Tiago Alves <271846427+tiagomcalves@users.noreply.github.com>
+Date:   Tue Aug 4 22:15:28 2026 +0200
+
+    Merge pull request #1 from eozaki/eo-server
+    
+    First PR
+
+[33mcommit 42c8f74302ba92d8879d3046d15cc9d5de818ca1[m
+Author: erick <erickozaki@aquaporservicos.pt>
+Date:   Wed Jul 22 16:27:10 2026 +0100
+
+    Logger
+
+[33mcommit 8bd5d76856ba12d96c477d61696a83fcebeafcb4[m
+Author: erick <erickozaki@aquaporservicos.pt>
+Date:   Wed Jul 22 15:16:48 2026 +0100
+
+    Server and client handler skeleton
+
+[33mcommit 3d17183247512b6d7fc23f1bd6af78f15349047d[m
+Author: erick <erickozaki@aquaporservicos.pt>
+Date:   Wed Jul 15 23:02:56 2026 +0100
+
+    add idea dir to gitignore
+
+[33mcommit 300834c8bd2f81a3dbcd1880245f847d0d3086cf[m
+Author: erick <erickozaki@aquaporservicos.pt>
+Date:   Wed Jul 15 23:01:22 2026 +0100
+
+    Project creation
