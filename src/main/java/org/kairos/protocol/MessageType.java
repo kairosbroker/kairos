@@ -1,19 +1,20 @@
 package org.kairos.protocol;
 
+import org.kairos.protocol.generic.Message;
 import org.kairos.protocol.message.*;
 
 public enum MessageType {
     MSG_PING(255, Ping.class), //  Control
     MSG_CONNECT(1, Control.class), MSG_DISCONNECT(2, Control.class), MSG_TIMEOUT(3, Control.class),
-    MSG_JOIN(4, TopicControl.class), /*MSG_CREATE(TopicControl.class),*/
-    MSG_LEAVE(5, TopicControl.class),
+    MSG_JOIN(4, JoinTopic.class), /*MSG_CREATE(TopicControl.class),*/
+    MSG_LEAVE(5, LeaveTopic.class),
     MSG_PUBLISH(8, Publish.class), MSG_CONSUME(9, Consume.class),
     MSG_OK(200, Status.class), MSG_ERROR(240, Status.class);
 
     private final int msgID;
-    private final Class<? extends AbstractMessage> msgPackager;
+    private final Class<? extends Message> msgPackager;
 
-    MessageType(int msgCode, Class<? extends AbstractMessage> msgPackager) {
+    MessageType(int msgCode, Class<? extends Message> msgPackager) {
         this.msgID = msgCode;
         this.msgPackager = msgPackager;
     }
@@ -22,7 +23,7 @@ public enum MessageType {
         return msgID;
     }
 
-    public Class<? extends AbstractMessage> getMessagePackager() {
+    public Class<? extends Message> getMessagePackager() {
         return msgPackager;
     }
 
@@ -36,7 +37,7 @@ public enum MessageType {
         throw new IllegalArgumentException("Unknown MessageType id: " + msgID);
     }
 
-    public static Class<? extends AbstractMessage> getPackagerByID(int msgID) {
+    public static Class<? extends Message> getPackagerByID(int msgID) {
         MessageType msgType = MessageType.values()[msgID];
         return msgType.getMessagePackager();
     }

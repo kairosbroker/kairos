@@ -1,11 +1,11 @@
 package org.kairos.protocol.message;
 
-import org.kairos.protocol.AbstractCodeMessage;
 import org.kairos.protocol.MessageType;
+import org.kairos.protocol.generic.CodeMessage;
 
 import java.io.DataInputStream;
 
-public final class Control extends AbstractCodeMessage {
+public final class Control extends CodeMessage {
     public Control(MessageType type) {
         super(type);
         if (type.getMessagePackager() != this.getClass())
