@@ -2,9 +2,7 @@ package org.kairos;
 
 import org.kairos.protocol.MessageType;
 import org.kairos.protocol.generic.Message;
-import org.kairos.protocol.message.Control;
-import org.kairos.protocol.message.JoinTopic;
-import org.kairos.protocol.message.Status;
+import org.kairos.protocol.message.*;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
@@ -41,7 +39,8 @@ public class ClientHandler extends Thread implements Runnable {
         boolean isPublisher = clientType == MessageType.MSG_ID_PUBLISHER;
         reply(new Status(MessageType.MSG_OK));
 
-        JoinTopic joinTopic = (JoinTopic) waitForResponse();
+        JoinTopic joinTopicMessage = (JoinTopic) waitForResponse();
+        subscribedTopic = TopicManager.getInstance().join(joinTopicMessage.getTopic(), this);
 
         if (isPublisher) {
             loopPublisher();
@@ -64,13 +63,32 @@ public class ClientHandler extends Thread implements Runnable {
             if (newMessage.getType() == MessageType.MSG_DISCONNECT) {
                 return;
             }
+
             Logger.info("Client " + socket.getPort() + ": " + newMessage);
+
+            try {
+                subscribedTopic.publish( ((Publish) newMessage).getMessage() );
+            } catch (InterruptedException e) {
+                Logger.warn("Client interrupted the publishing of a new message");
+                break;
+            }
         }
 
     }
 
     private void loopConsumer() {
-        // Fetch new Message in Topic Queue
+        String lastTopicMessage;
+        boolean success = true;
+
+        while (success) {
+            try {
+                lastTopicMessage = subscribedTopic.consume();
+                reply((new Consume(lastTopicMessage)));
+                Logger.info("Client " + socket.getPort() + " consumed " + lastTopicMessage);
+            } catch (InterruptedException e) {
+                success = false;
+            }
+        }
     }
 
     private MessageType greetClient() {
@@ -80,11 +98,12 @@ public class ClientHandler extends Thread implements Runnable {
             Control clientIdentify = (Control) waitForResponse();
 
             if (clientIdentify.getType() != MessageType.MSG_ID_PUBLISHER && clientIdentify.getType() != MessageType.MSG_ID_CONSUMER) {
-                Logger.info("Client " + socket.getPort() + " did not identify the type of user in time (" + CLIENT_IDENTIFY_TIMEOUT / 1000 + " seconds)");
+                Logger.warn("Client " + socket.getPort() + " did not identify the type of user in time (" + CLIENT_IDENTIFY_TIMEOUT / 1000 + " seconds)");
                 closeConnection(this);
                 return null;
             }
 
+            Logger.info("Client " + socket.getPort() + " identified as " + clientIdentify.getType());
             return clientIdentify.getType();
 
         } catch (IOException e) {

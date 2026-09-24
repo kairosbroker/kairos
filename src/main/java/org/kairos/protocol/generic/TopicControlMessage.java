@@ -5,6 +5,7 @@ import org.kairos.protocol.MessageType;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 
 public abstract class TopicControlMessage extends Message {
     private final String topicName;
@@ -18,22 +19,21 @@ public abstract class TopicControlMessage extends Message {
         super(type, input);
 
         byte[] buffer = new byte[MAX_TOPIC_NAME];
-        input.read(buffer);
-
-        this.topicName = new String(buffer);
+        int topicNameSize = input.read(buffer);
+        this.topicName = new String(buffer, 0, topicNameSize, StandardCharsets.UTF_8);
     }
 
-    public final String geTopic() {
+    public final String getTopic() {
         return topicName;
     }
 
     @Override
     public byte[] serialize() {
-        int msgSize = (Byte.SIZE / 8) + MAX_TOPIC_NAME;
+        int msgSize = (Byte.SIZE / 8) + (Math.min(getTopic().getBytes(StandardCharsets.UTF_8).length, MAX_TOPIC_NAME));
         ByteBuffer serializedMessage = ByteBuffer.allocate(msgSize);
 
         serializedMessage.put((byte) getType().getID());
-        serializedMessage.put(geTopic().getBytes());
+        serializedMessage.put(getTopic().getBytes(StandardCharsets.UTF_8));
 
         return serializedMessage.array();
     }
