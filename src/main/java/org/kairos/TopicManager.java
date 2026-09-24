@@ -21,22 +21,26 @@ public class TopicManager {
     public Topic create(String name, ClientHandler client) {
         Topic _topic = new Topic(name, client);
         topicPool.put(name, _topic);
-
+        Logger.info("New Topic created by client " + client.getName() + ": " + name );
         return _topic;
     }
 
-    public boolean join(String name, ClientHandler client) {
+    public Topic join(String name, ClientHandler client) {
         Topic _topic = topicPool.get(name);
 
         if (_topic == null) {
-            System.err.println("Error: topic nonexistent in poll, creating new one");
-            create(name, client);
-            return true;
+            Logger.warn("Topic nonexistent in poll, creating new one");
+            _topic = create(name, client);
+            return _topic;
         }
 
-        int joined = _topic.addSubscriber(client);
+        if( _topic.addSubscriber(client) == -1 ){
+            return null;
+        }
 
-        return joined != -1;
+        Logger.info("Client " + client.getName() + " joined an existing topic: " + _topic.getName() );
+
+        return _topic;
     }
 
     public boolean leave(String name, ClientHandler client) {

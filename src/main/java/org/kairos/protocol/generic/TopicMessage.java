@@ -18,7 +18,7 @@ public abstract class TopicMessage extends Message {
 
     public TopicMessage(MessageType type, DataInputStream input) throws IOException {
         super(type, input);
-//        System.out.println("Building a " + type + " Message");
+
         int msgSizeParam = input.readInt();
         if (msgSizeParam < 0 || msgSizeParam > MAX_MSG_BODY)
             throw new ProtocolException("Message body size arrgument has invalid payload size");
@@ -26,7 +26,6 @@ public abstract class TopicMessage extends Message {
         byte[] buffer = new byte[msgSizeParam];
         int msgSizeRead = input.read(buffer);
 
-//        System.out.println("msgSizeParam " + msgSizeParam + " msgSizeRead " + msgSizeRead);
         if (msgSizeParam != msgSizeRead) throw new ProtocolException("payload size mismatch");
 
         this.msg = new String(buffer);
@@ -42,10 +41,10 @@ public abstract class TopicMessage extends Message {
         ByteBuffer serializedMessage = ByteBuffer.allocate(msgSize);
 
         byte myByte = (byte) getType().getID();
-//        System.out.println("MyByte: " + myByte + " was supposed to be: " + getType().getID());
+
         serializedMessage.put((byte) getType().getID());
         serializedMessage.putInt(getMessage().getBytes(StandardCharsets.UTF_8).length);
-        serializedMessage.put(getMessage().getBytes());
+        serializedMessage.put(getMessage().getBytes(StandardCharsets.UTF_8));
 
         return serializedMessage.array();
     }

@@ -33,7 +33,6 @@ public abstract class Message {
     public abstract byte[] serialize();
 
     public static Message deserialize(int msgID, DataInputStream input) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-//        System.out.println("Read byte: " + msgID);
         MessageType msgType = MessageType.fromId(msgID);
         Class<? extends Message> msgPackager = msgType.getMessagePackager();
         return msgPackager.getDeclaredConstructor(MessageType.class, DataInputStream.class).newInstance(msgType, input);
