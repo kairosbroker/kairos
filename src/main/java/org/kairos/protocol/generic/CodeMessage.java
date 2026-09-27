@@ -1,15 +1,17 @@
-package org.kairos.protocol;
+package org.kairos.protocol.generic;
+
+import org.kairos.protocol.MessageType;
 
 import java.io.DataInputStream;
 import java.nio.ByteBuffer;
 
-public abstract class AbstractCodeMessage extends AbstractMessage {
+public abstract class CodeMessage extends Message {
 
-    public AbstractCodeMessage(MessageType type) {
+    public CodeMessage(MessageType type) {
         super(type);
     }
 
-    public AbstractCodeMessage(MessageType type, DataInputStream input) {
+    public CodeMessage(MessageType type, DataInputStream input) {
         super(type, input);
     }
 

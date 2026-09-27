@@ -1,4 +1,6 @@
-package org.kairos.protocol;
+package org.kairos.protocol.generic;
+
+import org.kairos.protocol.MessageType;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -6,17 +8,17 @@ import java.net.ProtocolException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
-public abstract class AbstractTopicMessage extends AbstractMessage {
+public abstract class TopicMessage extends Message {
     private final String msg;
 
-    public AbstractTopicMessage(MessageType type, String message) {
+    public TopicMessage(MessageType type, String message) {
         super(type);
         this.msg = message;
     }
 
-    public AbstractTopicMessage(MessageType type, DataInputStream input) throws IOException {
+    public TopicMessage(MessageType type, DataInputStream input) throws IOException {
         super(type, input);
-//        System.out.println("Building a " + type + " Message");
+
         int msgSizeParam = input.readInt();
         if (msgSizeParam < 0 || msgSizeParam > MAX_MSG_BODY)
             throw new ProtocolException("Message body size arrgument has invalid payload size");
@@ -24,7 +26,6 @@ public abstract class AbstractTopicMessage extends AbstractMessage {
         byte[] buffer = new byte[msgSizeParam];
         int msgSizeRead = input.read(buffer);
 
-//        System.out.println("msgSizeParam " + msgSizeParam + " msgSizeRead " + msgSizeRead);
         if (msgSizeParam != msgSizeRead) throw new ProtocolException("payload size mismatch");
 
         this.msg = new String(buffer);
@@ -39,11 +40,9 @@ public abstract class AbstractTopicMessage extends AbstractMessage {
         int msgSize = (Byte.SIZE / 8) + (Integer.SIZE / 8) + getMessage().getBytes(StandardCharsets.UTF_8).length;
         ByteBuffer serializedMessage = ByteBuffer.allocate(msgSize);
 
-        byte myByte = (byte) getType().getID();
-//        System.out.println("MyByte: " + myByte + " was supposed to be: " + getType().getID());
         serializedMessage.put((byte) getType().getID());
         serializedMessage.putInt(getMessage().getBytes(StandardCharsets.UTF_8).length);
-        serializedMessage.put(getMessage().getBytes());
+        serializedMessage.put(getMessage().getBytes(StandardCharsets.UTF_8));
 
         return serializedMessage.array();
     }
