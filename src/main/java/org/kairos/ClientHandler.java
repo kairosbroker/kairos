@@ -97,7 +97,7 @@ public class ClientHandler extends Thread implements Runnable {
 
             if (clientIdentify.getType() != MessageType.MSG_ID_PUBLISHER && clientIdentify.getType() != MessageType.MSG_ID_CONSUMER) {
                 Logger.warn("Client " + socket.getPort() + " did not identify the type of user in time (" + CLIENT_IDENTIFY_TIMEOUT / 1000 + " seconds)");
-                closeConnection(this);
+                closeConnections();
                 return null;
             }
 
