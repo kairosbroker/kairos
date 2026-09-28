@@ -22,7 +22,7 @@ public class Topic {
 
     public int addSubscriber(ClientHandler client) {
         if (subscribers.contains(client)) {
-            Logger.error("Client already subscribed to this topic.", new InternalError("fds"));
+            Logger.error("Client already subscribed to this topic.", null);
             return -1;
         }
 
