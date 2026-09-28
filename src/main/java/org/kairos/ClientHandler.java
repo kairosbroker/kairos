@@ -27,13 +27,12 @@ public class ClientHandler extends Thread implements Runnable {
             in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
 
         } catch (IOException e) {
-            Logger.error("Unable to open IO channels for the client handler", e);
+            Logger.error("Kairos was not able to open IO channels for the client handler", e);
         }
     }
 
     @Override
     public void run() {
-
         MessageType clientType = greetClient();
         if (clientType == null) return;
         boolean isPublisher = clientType == MessageType.MSG_ID_PUBLISHER;
@@ -47,7 +46,6 @@ public class ClientHandler extends Thread implements Runnable {
         } else {
             loopConsumer();
         }
-
     }
 
     private void loopPublisher() {
@@ -99,7 +97,7 @@ public class ClientHandler extends Thread implements Runnable {
 
             if (clientIdentify.getType() != MessageType.MSG_ID_PUBLISHER && clientIdentify.getType() != MessageType.MSG_ID_CONSUMER) {
                 Logger.warn("Client " + socket.getPort() + " did not identify the type of user in time (" + CLIENT_IDENTIFY_TIMEOUT / 1000 + " seconds)");
-                closeConnection(this);
+                closeConnections();
                 return null;
             }
 
@@ -139,9 +137,18 @@ public class ClientHandler extends Thread implements Runnable {
         }
     }
 
-    public static void closeConnection(ClientHandler clientHandler) throws IOException {
-        clientHandler.in.close();
-        clientHandler.out.close();
-        clientHandler.socket.close();
+    public void closeConnections() {
+        try {
+            this.in.close();
+            this.out.close();
+            this.socket.close();
+        } catch (IOException e) {
+            Logger.error(
+                    "Something went wrong when trying to close ClientHandler connections",
+                    e
+            );
+        }
+
+        Logger.info("Closed connection to client " + this.socket.getPort());
     }
 }
