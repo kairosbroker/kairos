@@ -62,4 +62,13 @@ public class TopicManager {
         }
         return false;
     }
+
+    public boolean topicExist(String name) {
+        Topic _topic = topicPool.get(name);
+        if (_topic == null) {
+            return false;
+        }
+
+        return true;
+    }
 }
