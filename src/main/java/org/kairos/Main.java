@@ -22,7 +22,7 @@ public class Main {
             try {
                 s.run();
             } catch (IOException e) {
-                System.out.println("Fatal error");
+                Logger.error("Fatal error", e);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);

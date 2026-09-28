@@ -22,7 +22,10 @@ public class Topic {
 
     public int addSubscriber(ClientHandler client) {
         if (subscribers.contains(client)) {
-            Logger.error("Client already subscribed to this topic.", null);
+            Logger.error(
+                    "Error: client already subscribed to this topic.",
+                    new RuntimeException("Client is already subscribe to the requested topic")
+            );
             return -1;
         }
 
@@ -34,7 +37,7 @@ public class Topic {
 
     public int removeSubscriber(ClientHandler client) {
         if (!subscribers.contains(client)) {
-            System.err.println("Error: client is not subscribed on this topic.");
+            Logger.warn("Error: client is not subscribed on this topic.");
             return -1;
         }
 
