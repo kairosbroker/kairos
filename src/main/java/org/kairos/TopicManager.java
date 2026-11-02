@@ -18,7 +18,7 @@ public class TopicManager {
         return INSTANCE;
     }
 
-    public Topic create(String name, ClientHandler client) {
+    private Topic create(String name, ClientHandler client) {
         Topic _topic = new Topic(name, client);
         topicPool.put(name, _topic);
         Logger.info("New Topic created by client " + client.getName() + ": " + name );
@@ -61,5 +61,9 @@ public class TopicManager {
             return true;
         }
         return false;
+    }
+
+    public boolean topicExist(String name) {
+        return topicPool.get(name) != null;
     }
 }
