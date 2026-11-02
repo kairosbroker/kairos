@@ -1,7 +1,5 @@
 package org.kairos;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -11,23 +9,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class TopicTest {
 
-    ClientHandler cHandler;
-    ClientHandler otherClient;
+    ClientHandler clientHandleAlpha;
+    ClientHandler clientHandleBravo;
     Topic topic;
-
-    @BeforeAll
-    static void setUpAll() {
-    }
 
     @BeforeEach
     void setUp() {
-        cHandler = new ClientHandler(new Socket());
-        otherClient = new ClientHandler(new Socket());
-        topic = new Topic("topic-key", cHandler);
-    }
-
-    @AfterEach
-    void tearDown() {
+        clientHandleAlpha = new ClientHandler(new Socket());
+        clientHandleBravo = new ClientHandler(new Socket());
+        topic = new Topic("topic-key", clientHandleAlpha);
     }
 
     @Test
@@ -37,16 +27,16 @@ class TopicTest {
 
     @Test
     void addSubscriber() {
-        assertEquals(-1, topic.addSubscriber(cHandler));
-        assertEquals(2, topic.addSubscriber(otherClient));
+        assertEquals(-1, topic.addSubscriber(clientHandleAlpha));
+        assertEquals(2, topic.addSubscriber(clientHandleBravo));
     }
 
     @Test
     void removeSubscriber() {
-        topic.addSubscriber(otherClient);
-        assertEquals(1, topic.removeSubscriber(cHandler));
-        assertEquals(-1, topic.removeSubscriber(cHandler));
-        assertEquals(0, topic.removeSubscriber(otherClient));
+        topic.addSubscriber(clientHandleBravo);
+        assertEquals(1, topic.removeSubscriber(clientHandleAlpha));
+        assertEquals(-1, topic.removeSubscriber(clientHandleAlpha));
+        assertEquals(0, topic.removeSubscriber(clientHandleBravo));
     }
 
     @Test
