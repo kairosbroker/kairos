@@ -1,11 +1,14 @@
 package org.kairos;
 
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.concurrent.ArrayBlockingQueue;
 
 public class Topic {
+
     private final String topicName;
     private int subscriberCount = 0;
+    private Instant deletionTimestamp = null;
     private final HashSet<ClientHandler> subscribers;
     private final ArrayBlockingQueue<String> msgs;
 
@@ -57,5 +60,20 @@ public class Topic {
 
     public void publish(String data) throws InterruptedException {
         msgs.put(data);
+    }
+
+    public void markForDeletion(Instant timestamp)
+    {
+        deletionTimestamp = timestamp;
+    }
+
+    public void removeDeletionTimestamp()
+    {
+        deletionTimestamp = null;
+    }
+
+    public Instant getDeletionTimestamp()
+    {
+        return deletionTimestamp;
     }
 }

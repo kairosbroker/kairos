@@ -1,13 +1,21 @@
 package org.kairos;
 
+import java.time.Instant;
 import java.util.HashMap;
+import java.util.PriorityQueue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.PriorityBlockingQueue;
 
 public class TopicManager {
     private static TopicManager INSTANCE;
-    private final HashMap<String, Topic> topicPool;
+    private static int SECONDS_TO_DELETION = (60 * 60);     // 1 hour
+    private final ConcurrentHashMap<String, Topic> topicPool;
+    private final PriorityBlockingQueue<Topic> deleteQueue;
 
     private TopicManager() {
-        this.topicPool = new HashMap<>();
+        this.topicPool = new ConcurrentHashMap<>();
+        this.deleteQueue = new PriorityBlockingQueue<>();
+
     }
 
     public static TopicManager getInstance() {
@@ -38,6 +46,11 @@ public class TopicManager {
             return null;
         }
 
+        if(_topic.getDeletionTimestamp() != null && deleteQueue.remove(_topic))
+        {
+            _topic.removeDeletionTimestamp();
+        }
+
         Logger.info("Client " + client.getName() + " joined an existing topic: " + _topic.getName() );
 
         return _topic;
@@ -57,7 +70,11 @@ public class TopicManager {
             if (remainingSubscribers == 0 && _topic.getMessagesQuantity() == 0) {
                 topicPool.remove(name, _topic);
                 Logger.info("Last client unsubscribed from \"" + name + "\", removed from topic pool.");
+                return true;
             }
+
+            _topic.markForDeletion(Instant.now().plusSeconds(SECONDS_TO_DELETION));
+            deleteQueue.add(_topic);
             return true;
         }
         return false;
