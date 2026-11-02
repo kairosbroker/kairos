@@ -8,7 +8,7 @@ import java.util.concurrent.PriorityBlockingQueue;
 
 public class TopicManager {
     private static TopicManager INSTANCE;
-    private static int SECONDS_TO_DELETION = (60 * 60);     // 1 hour
+    private static final int SECONDS_TO_DELETION = (60 * 60);     // 1 hour
     private final ConcurrentHashMap<String, Topic> topicPool;
     private final PriorityBlockingQueue<Topic> deleteQueue;
 
