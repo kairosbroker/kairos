@@ -39,7 +39,11 @@ public class ClientHandler extends Thread implements Runnable {
         reply(new Status(MessageType.MSG_OK));
 
         JoinTopic joinTopicMessage = (JoinTopic) waitForResponse();
-        subscribedTopic = TopicManager.getInstance().join(joinTopicMessage.getTopic(), this);
+        try {
+            subscribedTopic = TopicManager.getInstance().join(joinTopicMessage.getTopic(), this);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
 
         if (isPublisher) {
             loopPublisher();
@@ -65,7 +69,7 @@ public class ClientHandler extends Thread implements Runnable {
             Logger.info("Client " + socket.getPort() + ": " + newMessage);
 
             try {
-                subscribedTopic.publish( ((Publish) newMessage).getMessage() );
+                subscribedTopic.publish(((Publish) newMessage).getMessage());
             } catch (InterruptedException e) {
                 Logger.warn("Client interrupted the publishing of a new message");
                 break;
@@ -106,9 +110,9 @@ public class ClientHandler extends Thread implements Runnable {
 
         } catch (IOException e) {
             Logger.error("Connection was closed abruptly", e);
-            throw new RuntimeException(e);
+//            throw new RuntimeException(e);
         }
-
+        return null;
     }
 
     private boolean reply(Message message) {
@@ -133,8 +137,10 @@ public class ClientHandler extends Thread implements Runnable {
             if (e.getClass() == SocketException.class) {
                 Logger.error("Connection was closed abruptly", e);
             }
-            throw new RuntimeException(e);
+            TopicManager.getInstance().leave(subscribedTopic.getName(), this);
+//            throw new RuntimeException(e);
         }
+        return null;
     }
 
     public void closeConnections() {
@@ -143,10 +149,7 @@ public class ClientHandler extends Thread implements Runnable {
             this.out.close();
             this.socket.close();
         } catch (IOException e) {
-            Logger.error(
-                    "Something went wrong when trying to close ClientHandler connections",
-                    e
-            );
+            Logger.error("Something went wrong when trying to close ClientHandler connections", e);
         }
 
         Logger.info("Closed connection to client " + this.socket.getPort());
