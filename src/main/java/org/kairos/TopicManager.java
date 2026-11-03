@@ -72,7 +72,7 @@ public class TopicManager {
         int remainingSubscribers = _topic.removeSubscriber(client);
 
         if (remainingSubscribers < 0) {
-            Logger.warn("Something went wrong when trying to unsubscribe client " + client.threadId() + " from topic \"" + name + "\".");
+            Logger.warn("Something went wrong when trying to unsubscribe client " + client + " from topic \"" + name + "\".");
             return false;
         }
 
