@@ -111,7 +111,7 @@ public class TopicManager {
 
                 try {
                     Logger.warn("DeleteScheduler: will delete topic \"" + nextToDelete.getName() + "\" in " + remaining.getSeconds() + " seconds");
-                    Thread.sleep(remaining);
+                    Thread.sleep(remaining.toMillis());
                     Logger.info("DeleteScheduler: removed topic \"" + nextToDelete.getName() + "\" from pool");
                     topicPool.remove(nextToDelete.getName(), nextToDelete);
                     deleteQueue.take();
