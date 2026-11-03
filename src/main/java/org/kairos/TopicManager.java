@@ -1,8 +1,7 @@
 package org.kairos;
 
+import java.time.Duration;
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.PriorityQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.PriorityBlockingQueue;
 
@@ -11,11 +10,12 @@ public class TopicManager {
     private static final int SECONDS_TO_DELETION = (60 * 60);     // 1 hour
     private final ConcurrentHashMap<String, Topic> topicPool;
     private final PriorityBlockingQueue<Topic> deleteQueue;
+    private final DeleteScheduler deleteScheduler;
 
     private TopicManager() {
         this.topicPool = new ConcurrentHashMap<>();
         this.deleteQueue = new PriorityBlockingQueue<>();
-
+        this.deleteScheduler = new DeleteScheduler();
     }
 
     public static TopicManager getInstance() {
@@ -46,9 +46,18 @@ public class TopicManager {
             return null;
         }
 
-        if(_topic.getDeletionTimestamp() != null && deleteQueue.remove(_topic))
+        if(_topic.getDeletionTimestamp() != null)
         {
-            _topic.removeDeletionTimestamp();
+            if(deleteQueue.peek() == _topic)
+            {
+                _topic.removeDeletionTimestamp();
+                deleteScheduler.reschedule();
+            }
+            else
+            {
+                _topic.removeDeletionTimestamp();
+            }
+
         }
 
         Logger.info("Client " + client.getName() + " joined an existing topic: " + _topic.getName() );
@@ -73,8 +82,7 @@ public class TopicManager {
                 return true;
             }
 
-            _topic.markForDeletion(Instant.now().plusSeconds(SECONDS_TO_DELETION));
-            deleteQueue.add(_topic);
+            deleteScheduler.schedule(_topic);
             return true;
         }
         return false;
@@ -82,5 +90,50 @@ public class TopicManager {
 
     public boolean topicExist(String name) {
         return topicPool.get(name) != null;
+    }
+
+    class DeleteScheduler implements Runnable {
+        private Thread worker;
+
+        @Override
+        public void run() {
+            while(true){
+                Topic nextToDelete = deleteQueue.peek();
+
+                if(nextToDelete == null )   //  || nextToDelete.getDeletionTimestamp() == null) // should not happen
+                {
+                    Logger.info("Delete Scheduler cleared queue, terminating.");
+                    return;
+                }
+
+                Duration remaining = Duration.between(Instant.now(), nextToDelete.getDeletionTimestamp());
+
+                try{
+                    Thread.sleep(remaining);
+                    Logger.info("Delete Scheduler removed topic \"" + nextToDelete.getName() + "\" from pool.");
+                    topicPool.remove(nextToDelete.getName(), nextToDelete);
+
+                } catch (InterruptedException e) {
+                    Logger.info("Delete Scheduler interrupted, rescheduling");
+                }
+            }
+        }
+
+        void reschedule()
+        {
+            worker.interrupt();
+        }
+
+        synchronized void schedule(Topic topic)
+        {
+            topic.markForDeletion(Instant.now().plusSeconds(SECONDS_TO_DELETION));
+            deleteQueue.add(topic);
+
+            if(worker == null || !worker.isAlive())
+            {
+                worker = new Thread(this);
+                worker.start();
+            }
+        }
     }
 }
