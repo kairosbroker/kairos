@@ -1,31 +1,32 @@
 package org.kairos;
 
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.concurrent.ArrayBlockingQueue;
 
 public class Topic {
+
+    private static final int MAX_MSGS = 100;
     private final String topicName;
     private int subscriberCount = 0;
+    private Instant deletionTimestamp = null;
     private final HashSet<ClientHandler> subscribers;
     private final ArrayBlockingQueue<String> msgs;
 
     public Topic(String key, ClientHandler creator) {
         this.topicName = key;
-        this.subscribers = new HashSet<ClientHandler>();
-        this.msgs = new ArrayBlockingQueue<String>(10);
+        this.subscribers = new HashSet<>();
+        this.msgs = new ArrayBlockingQueue<>(MAX_MSGS);
         addSubscriber(creator);
     }
 
-    public String getName(){
+    public String getName() {
         return topicName;
     }
 
-    public int addSubscriber(ClientHandler client) {
+    public synchronized int addSubscriber(ClientHandler client) {
         if (subscribers.contains(client)) {
-            Logger.error(
-                    "Error: client already subscribed to this topic.",
-                    new RuntimeException("Client is already subscribe to the requested topic")
-            );
+            Logger.error("Error: client already subscribed to this topic.", new RuntimeException("Client is already subscribe to the requested topic"));
             return -1;
         }
 
@@ -35,7 +36,7 @@ public class Topic {
         return subscriberCount;
     }
 
-    public int removeSubscriber(ClientHandler client) {
+    public synchronized int removeSubscriber(ClientHandler client) {
         if (!subscribers.contains(client)) {
             Logger.warn("Error: client is not subscribed on this topic.");
             return -1;
@@ -57,5 +58,17 @@ public class Topic {
 
     public void publish(String data) throws InterruptedException {
         msgs.put(data);
+    }
+
+    public void markForDeletion(Instant timestamp) {
+        deletionTimestamp = timestamp;
+    }
+
+    public void removeDeletionTimestamp() {
+        deletionTimestamp = null;
+    }
+
+    public Instant getDeletionTimestamp() {
+        return deletionTimestamp;
     }
 }

@@ -24,7 +24,7 @@ class TopicManagerTest {
     }
 
     @Test
-    void join() {
+    void join() throws InterruptedException {
         //  Joining new Topic
         Topic newTopic = INSTANCE.join("new-topic-test", clientHandleAlpha);
         assertNotNull(newTopic);
