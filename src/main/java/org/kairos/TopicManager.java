@@ -122,7 +122,7 @@ public class TopicManager {
             }
         }
 
-        void reschedule() throws InterruptedException {
+        public void reschedule() throws InterruptedException {
             worker.interrupt();
             Topic nextToDelete = deleteQueue.peek();
             if (nextToDelete != null && nextToDelete.getDeletionTimestamp() == null) {
