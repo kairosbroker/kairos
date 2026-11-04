@@ -130,7 +130,7 @@ public class TopicManager {
             }
         }
 
-        synchronized void schedule(Topic topic) {
+        public synchronized void schedule(Topic topic) {
             Logger.info("DeleteScheduler: added topic \"" + topic.getName() + "\" to delete schedule");
             topic.markForDeletion(Instant.now().plusSeconds(SECONDS_TO_DELETION));
             deleteQueue.add(topic);
