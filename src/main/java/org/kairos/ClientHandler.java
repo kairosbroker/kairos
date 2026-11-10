@@ -96,13 +96,13 @@ public class ClientHandler extends Thread implements Runnable {
                 lastTopicMessage = subscribedTopic.consume();
 
                 if (lastTopicMessage == null) {
-                    if(! reply(new Ping()) )
+                    if(!reply(new Ping()) )
                         Thread.currentThread().interrupt();
 
                     continue;
                 }
 
-                reply((new Consume(lastTopicMessage)));
+                reply(new Consume(lastTopicMessage));
                 Logger.info("Client " + socket.getPort() + " consumed " + lastTopicMessage);
 
             } catch (InterruptedException e) {
