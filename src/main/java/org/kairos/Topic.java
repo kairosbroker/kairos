@@ -3,6 +3,7 @@ package org.kairos;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 public class Topic {
 
@@ -53,7 +54,7 @@ public class Topic {
     }
 
     public String consume() throws InterruptedException {
-        return msgs.take();
+        return msgs.poll(2, TimeUnit.SECONDS);
     }
 
     public void publish(String data) throws InterruptedException {

@@ -50,6 +50,8 @@ public class ClientHandler extends Thread implements Runnable {
         } else {
             loopConsumer();
         }
+
+        closeConnections();
     }
 
     private void loopPublisher() {
@@ -85,8 +87,15 @@ public class ClientHandler extends Thread implements Runnable {
         while (success) {
             try {
                 lastTopicMessage = subscribedTopic.consume();
+
+                if (lastTopicMessage == null) {
+                    reply(new Ping());
+                    continue;
+                }
+
                 reply((new Consume(lastTopicMessage)));
                 Logger.info("Client " + socket.getPort() + " consumed " + lastTopicMessage);
+
             } catch (InterruptedException e) {
                 success = false;
             }
@@ -110,7 +119,6 @@ public class ClientHandler extends Thread implements Runnable {
 
         } catch (IOException e) {
             Logger.error("Connection was closed abruptly", e);
-//            throw new RuntimeException(e);
         }
         return null;
     }
@@ -124,6 +132,7 @@ public class ClientHandler extends Thread implements Runnable {
 
         } catch (IOException e) {
             Logger.error("Unable to reply to client " + socket.getPort(), e);
+            Thread.currentThread().interrupt();
             return false;
         }
     }
@@ -137,8 +146,6 @@ public class ClientHandler extends Thread implements Runnable {
             if (e.getClass() == SocketException.class) {
                 Logger.error("Connection was closed abruptly", e);
             }
-            TopicManager.getInstance().leave(subscribedTopic.getName(), this);
-//            throw new RuntimeException(e);
         }
         return null;
     }
@@ -152,6 +159,7 @@ public class ClientHandler extends Thread implements Runnable {
             Logger.error("Something went wrong when trying to close ClientHandler connections", e);
         }
 
+        TopicManager.getInstance().leave(subscribedTopic.getName(), this);
         Logger.info("Closed connection to client " + this.socket.getPort());
     }
 }
