@@ -39,6 +39,13 @@ public class ClientHandler extends Thread implements Runnable {
         reply(new Status(MessageType.MSG_OK));
 
         JoinTopic joinTopicMessage = (JoinTopic) waitForResponse();
+
+        if(joinTopicMessage == null)
+        {
+            closeConnections();
+            return;
+        }
+
         try {
             subscribedTopic = TopicManager.getInstance().join(joinTopicMessage.getTopic(), this);
         } catch (InterruptedException e) {
@@ -64,7 +71,7 @@ public class ClientHandler extends Thread implements Runnable {
         while (true) {
             Message newMessage = waitForResponse();
 
-            if (newMessage.getType() == MessageType.MSG_DISCONNECT) {
+            if (newMessage == null || newMessage.getType() == MessageType.MSG_DISCONNECT) {
                 return;
             }
 
@@ -89,7 +96,9 @@ public class ClientHandler extends Thread implements Runnable {
                 lastTopicMessage = subscribedTopic.consume();
 
                 if (lastTopicMessage == null) {
-                    reply(new Ping());
+                    if(! reply(new Ping()) )
+                        Thread.currentThread().interrupt();
+
                     continue;
                 }
 
@@ -108,7 +117,7 @@ public class ClientHandler extends Thread implements Runnable {
             socket.setSoTimeout(CLIENT_IDENTIFY_TIMEOUT);
             Control clientIdentify = (Control) waitForResponse();
 
-            if (clientIdentify.getType() != MessageType.MSG_ID_PUBLISHER && clientIdentify.getType() != MessageType.MSG_ID_CONSUMER) {
+            if (clientIdentify == null || clientIdentify.getType() != MessageType.MSG_ID_PUBLISHER && clientIdentify.getType() != MessageType.MSG_ID_CONSUMER) {
                 Logger.warn("Client " + socket.getPort() + " did not identify the type of user in time (" + CLIENT_IDENTIFY_TIMEOUT / 1000 + " seconds)");
                 closeConnections();
                 return null;
@@ -137,14 +146,14 @@ public class ClientHandler extends Thread implements Runnable {
         }
     }
 
-    private Message waitForResponse() {   //(Class<M> expectedPackager)
+    private Message waitForResponse() {
         try {
             return Message.deserialize(in.readUnsignedByte(), in);
 
         } catch (IOException | InvocationTargetException | NoSuchMethodException | InstantiationException |
                  IllegalAccessException e) {
             if (e.getClass() == SocketException.class) {
-                Logger.error("Connection was closed abruptly", e);
+                Logger.error("waitForResponse(): Connection was closed abruptly", e);
             }
         }
         return null;
@@ -159,7 +168,10 @@ public class ClientHandler extends Thread implements Runnable {
             Logger.error("Something went wrong when trying to close ClientHandler connections", e);
         }
 
-        TopicManager.getInstance().leave(subscribedTopic.getName(), this);
+        if( subscribedTopic != null) {
+            TopicManager.getInstance().leave(subscribedTopic.getName(), this);
+        }
+
         Logger.info("Closed connection to client " + this.socket.getPort());
     }
 }
